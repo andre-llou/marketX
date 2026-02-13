@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String           @unique
+  password        String
+  role            String           @default("USER") // "ADMIN" or "USER"
+  createdInvestments Investment[]
+  userInvestments UserInvestment[]
+  createdAt       DateTime         @default(now())
+}
+
+model Investment {
+  id             Int              @id @default(autoincrement())
+  title          String
+  description    String
+  location       String
+  price          Float
+  expectedReturn String
+  contactInfo    String
+  imageUrl       String
+  creator        User             @relation(fields: [creatorId], references: [id])
+  creatorId      Int
+  userInvestments UserInvestment[]
+  createdAt      DateTime         @default(now())
+}
+
+model UserInvestment {
+  id           Int        @id @default(autoincrement())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  investment   Investment @relation(fields: [investmentId], references: [id])
+  investmentId Int
+  amount       Float
+  investedAt   DateTime   @default(now())
+}
